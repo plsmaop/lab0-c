@@ -32,6 +32,7 @@ void q_free(queue_t *q)
 }
 
 /*
+ * Util function for construct a new list element
  */
 list_ele_t *__q_insert_util(queue_t *q, char *s)
 {
@@ -170,7 +171,21 @@ int q_size(queue_t *q)
 void q_reverse(queue_t *q)
 {
     /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
+    if (!q || q->q_size == 0)
+        return;
+
+    list_ele_t *tmp = q->tail;
+    q->tail = q->head;
+    list_ele_t *cur = q->head;
+    q->head = tmp;
+    tmp = NULL;
+    while (cur) {
+        list_ele_t *next = cur->next;
+        cur->next = tmp;
+        tmp = cur;
+        cur = next;
+    }
+    return;
 }
 
 /*
