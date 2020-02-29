@@ -19,6 +19,7 @@ typedef struct ELE {
      * This array needs to be explicitly allocated and freed
      */
     char *value;
+    size_t value_size;
     struct ELE *next;
 } list_ele_t;
 
