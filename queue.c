@@ -200,6 +200,88 @@ void q_reverse(queue_t *q)
 }
 
 /*
+ * Compare function for sorting in ascending order
+ */
+bool __q_sort_cmp(const char *v1, const char *v2)
+{
+    return strcmp(v1, v2) < 0;
+}
+
+/*
+ * Merge two splited list by cmp()
+ */
+void __q_sort_merge(list_ele_t **n,
+                    list_ele_t *l,
+                    list_ele_t *r,
+                    bool (*cmp)(const char *, const char *))
+{
+    if (!l) {
+        *n = l;
+        return;
+    } else if (!r) {
+        *n = r;
+        return;
+    }
+
+    list_ele_t *merge = NULL;
+    if (cmp(l->value, r->value)) {
+        *n = l;
+        l = l->next;
+    } else {
+        *n = r;
+        r = r->next;
+    }
+    merge = *n;
+
+    while (l && r) {
+        if (cmp(l->value, r->value)) {
+            merge->next = l;
+            l = l->next;
+        } else {
+            merge->next = r;
+            r = r->next;
+        }
+
+        merge = merge->next;
+    }
+
+    if (l)
+        merge->next = l;
+    else
+        merge->next = r;
+
+    return;
+}
+
+/*
+ * merge sort
+ */
+list_ele_t *__q_sort(list_ele_t *head)
+{
+    if (!head || !(head->next))
+        return head;
+
+    // split list into two sublist
+    list_ele_t *slow = head, *fast = head->next;
+    while (fast) {
+        fast = fast->next;
+        if (fast) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+
+    list_ele_t *l = head, *r = slow->next;
+    slow->next = NULL;
+
+    l = __q_sort(l);
+    r = __q_sort(r);
+
+    __q_sort_merge(&head, l, r, __q_sort_cmp);
+    return head;
+}
+
+/*
  * Sort elements of queue in ascending order
  * No effect if q is NULL or empty. In addition, if q has only one
  * element, do nothing.
@@ -208,4 +290,17 @@ void q_sort(queue_t *q)
 {
     /* TODO: You need to write the code for this function */
     /* TODO: Remove the above comment when you are about to implement. */
+    if (!q || 1 >= q->q_size)
+        return;
+
+    q->head = __q_sort(q->head);
+
+    // determine new tail
+    list_ele_t *p = q->head;
+    while (p) {
+        q->tail = p;
+        p = p->next;
+    }
+
+    return;
 }
