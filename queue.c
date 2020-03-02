@@ -215,39 +215,22 @@ void __q_sort_merge(list_ele_t **n,
                     list_ele_t *r,
                     bool (*cmp)(const char *, const char *))
 {
-    if (!l) {
-        *n = l;
-        return;
-    } else if (!r) {
-        *n = r;
-        return;
-    }
-
-    list_ele_t **next = NULL;
-    if (cmp(l->value, r->value))
-        next = &l;
-    else
-        next = &r;
-
-    *n = *next;
-    *next = (*next)->next;
-
-    list_ele_t **merge = n;
+    list_ele_t **merge = n, **next = NULL;
     while (l && r) {
         if (cmp(l->value, r->value))
             next = &l;
         else
             next = &r;
 
-        (*merge)->next = *next;
+        *merge = *next;
         merge = &((*merge)->next);
         *next = (*next)->next;
     }
 
     if (l)
-        (*merge)->next = l;
-    else
-        (*merge)->next = r;
+        *merge = l;
+    else if (r)
+        *merge = r;
 
     return;
 }
