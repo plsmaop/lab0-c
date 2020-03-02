@@ -223,32 +223,31 @@ void __q_sort_merge(list_ele_t **n,
         return;
     }
 
-    list_ele_t *merge = NULL;
-    if (cmp(l->value, r->value)) {
-        *n = l;
-        l = l->next;
-    } else {
-        *n = r;
-        r = r->next;
-    }
-    merge = *n;
+    list_ele_t **next = NULL;
+    if (cmp(l->value, r->value))
+        next = &l;
+    else
+        next = &r;
 
+    *n = *next;
+    *next = (*next)->next;
+
+    list_ele_t **merge = n;
     while (l && r) {
-        if (cmp(l->value, r->value)) {
-            merge->next = l;
-            l = l->next;
-        } else {
-            merge->next = r;
-            r = r->next;
-        }
+        if (cmp(l->value, r->value))
+            next = &l;
+        else
+            next = &r;
 
-        merge = merge->next;
+        (*merge)->next = *next;
+        merge = &((*merge)->next);
+        *next = (*next)->next;
     }
 
     if (l)
-        merge->next = l;
+        (*merge)->next = l;
     else
-        merge->next = r;
+        (*merge)->next = r;
 
     return;
 }
