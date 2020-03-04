@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "harness.h"
+#include "strnatcmp.h"
 
 /*
  * Create empty queue.
@@ -14,7 +15,7 @@
 queue_t *q_new()
 {
     queue_t *q = (queue_t *) malloc(sizeof(queue_t));
-    /* TODO: What if malloc returned NULL? */
+    // What if malloc returned NULL?
     if (!q)
         return NULL;
 
@@ -26,7 +27,7 @@ queue_t *q_new()
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
-    /* TODO: How about freeing the list elements and the strings? */
+    /* How about freeing the list elements and the strings? */
     /* Free queue structure */
     if (!q)
         return;
@@ -165,11 +166,8 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
  */
 int q_size(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
     /* Remember: It should operate in O(1) time */
-    if (!q)
-        return 0;
-    return q->q_size;
+    return q ? q->q_size : 0;
 }
 
 /*
@@ -181,7 +179,6 @@ int q_size(queue_t *q)
  */
 void q_reverse(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
     if (!q || q->q_size == 0)
         return;
 
@@ -201,10 +198,19 @@ void q_reverse(queue_t *q)
 
 /*
  * Compare function for sorting in ascending order
- */
-bool __q_sort_cmp(const char *v1, const char *v2)
+
+bool __q_sort_cmp(const char *const v1, const char *const v2)
 {
     return strcmp(v1, v2) < 0;
+}
+*/
+
+/*
+ * Compare function for sorting in natural order
+ */
+bool __q_sort_nat_cmp(const char *const v1, const char *const v2)
+{
+    return strnatcmp(v1, v2) < 0;
 }
 
 /*
@@ -213,11 +219,11 @@ bool __q_sort_cmp(const char *v1, const char *v2)
 void __q_sort_merge(list_ele_t **n,
                     list_ele_t *l,
                     list_ele_t *r,
-                    bool (*cmp)(const char *, const char *))
+                    bool (*cmp_cb)(const char *const, const char *const))
 {
     list_ele_t **merge = n, **next = NULL;
     while (l && r) {
-        if (cmp(l->value, r->value))
+        if (cmp_cb(l->value, r->value))
             next = &l;
         else
             next = &r;
@@ -259,7 +265,7 @@ list_ele_t *__q_sort(list_ele_t *head)
     l = __q_sort(l);
     r = __q_sort(r);
 
-    __q_sort_merge(&head, l, r, __q_sort_cmp);
+    __q_sort_merge(&head, l, r, __q_sort_nat_cmp);
     return head;
 }
 
@@ -270,8 +276,6 @@ list_ele_t *__q_sort(list_ele_t *head)
  */
 void q_sort(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
     if (!q || 1 >= q->q_size)
         return;
 
